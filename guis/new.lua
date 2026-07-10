@@ -3868,7 +3868,7 @@ function mainapi:CreateCategory(categorysettings)
 			if not multiple then
 				mainapi:UpdateTextGUI()
 			end
-			task.spawn(modulesettings.Function, self.Enabled)
+			task.spawn(function() pcall(modulesettings.Function, self.Enabled) end)
 		end
 
 		for i, v in components do
@@ -4080,7 +4080,7 @@ function mainapi:CreateOverlay(categorysettings)
 				end
 
 				if categorysettings.Function then
-					task.spawn(categorysettings.Function, callback)
+					task.spawn(function() pcall(categorysettings.Function, callback) end)
 				end
 			end,
 			Icon = categorysettings.Icon,
@@ -5138,7 +5138,7 @@ function mainapi:CreateLegit()
 				end
 				table.clear(moduleapi.Connections)
 			end
-			task.spawn(modulesettings.Function, moduleapi.Enabled)
+			task.spawn(function() pcall(modulesettings.Function, moduleapi.Enabled) end)
 		end
 
 		back.MouseEnter:Connect(function()

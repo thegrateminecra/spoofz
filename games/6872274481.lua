@@ -2906,7 +2906,6 @@ end)
 
 run(function()
 	local ProjectileAura
-	local CustomProjectile
 	local Targets
 	local Range
 	local List
@@ -3000,10 +2999,7 @@ run(function()
 									local item, ammo, projectile, itemMeta = unpack(data)
 									if (FireDelays[item.itemType] or 0) < tick() then
 										rayCheck.FilterDescendantsInstances = {workspace.Map}
-										if# CustomProjectiles.ListEnabled > 0 then
-											projectile = CustomProjectiles.ListEnabled[math.random(1, #CustomProjectiles.ListEnabled)]
-										end
-										local meta = bedwars.ProjectileMeta[projectile]
+									local meta = bedwars.ProjectileMeta[projectile]
 										if not meta then
 											continue
 										end
@@ -3052,10 +3048,6 @@ run(function()
 	List = ProjectileAura:CreateTextList({
 		Name = 'Projectiles',
 		Default = {'arrow', 'snowball'}
-	})
-	CustomProjectiles = ProjectileAura:CreateTextList({
-		Name = 'Exploited Projectiles',
-		Default = {'meteor_shower', 'star', 'black_hole'}
 	})
 	Range = ProjectileAura:CreateSlider({
 		Name = 'Range',
