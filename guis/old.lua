@@ -3661,7 +3661,7 @@ mainapi.Blur = topbar:CreateToggle({
 	Function = function()
 		mainapi:BlurCheck()
 	end,
-	Default = true,
+	Default = false,
 	Tooltip = 'Blur the background of the GUI'
 })
 mainapi.Categories.Main.Options['GUI bind indicator'] = topbar:CreateToggle({

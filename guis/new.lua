@@ -5977,7 +5977,7 @@ mainapi.Blur = guipane:CreateToggle({
 	Function = function()
 		mainapi:BlurCheck()
 	end,
-	Default = true,
+	Default = false,
 	Tooltip = 'Blur the background of the GUI'
 })
 guipane:CreateToggle({
