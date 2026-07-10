@@ -4418,28 +4418,7 @@ run(function()
 		Tooltip = 'Chooses a random mode'
 	})
 
-	local AutoExecute
-	local lastAutoExecute = 0
-	AutoExecute = vape.Categories.Utility:CreateModule({
-		Name = 'AutoExecute',
-		Function = function(callback)
-			if callback then
-				local wasInGame
-				AutoExecute:Clean(runService.Heartbeat:Connect(function()
-					if store.matchState == 1 then
-						wasInGame = true
-					elseif wasInGame and store.matchState == 0 and tick() - lastAutoExecute > 30 then
-						wasInGame = false
-						lastAutoExecute = tick()
-						pcall(function()
-							loadstring(game:HttpGet('https://raw.githubusercontent.com/thegrateminecra/spoofz/main/loader.lua'))()
-						end)
-					end
-				end))
-			end
-		end,
-		Tooltip = 'Automatically re-executes the script after each game'
-	})
+
 end)
 
 run(function()
