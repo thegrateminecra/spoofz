@@ -6178,7 +6178,7 @@ run(function()
 			if callback then
 				oldvalues = table.clone(tab)
 				oldfont = debug.getconstant(bedwars.DamageIndicator, 86)
-				debug.setconstant(bedwars.DamageIndicator, 86, Enum.Font[FontOption.Value])
+				debug.setconstant(bedwars.DamageIndicator, 86, FontOption.Value)
 				debug.setconstant(bedwars.DamageIndicator, 119, Stroke.Enabled and 'Thickness' or 'Enabled')
 				tab.strokeThickness = Stroke.Enabled and 1 or false
 				tab.textSize = Size.Value
@@ -6208,7 +6208,7 @@ run(function()
 		List = fontitems,
 		Function = function(val)
 			if DamageIndicator.Enabled then
-				debug.setconstant(bedwars.DamageIndicator, 86, Enum.Font[val])
+				debug.setconstant(bedwars.DamageIndicator, 86, val)
 			end
 		end
 	})
