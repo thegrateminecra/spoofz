@@ -2913,9 +2913,17 @@ run(function()
 	local rayCheck = RaycastParams.new()
 	rayCheck.FilterType = Enum.RaycastFilterType.Include
 	local projectileRemote = {InvokeServer = function() end}
+	local bypassRemote, bypassReady
 	local FireDelays = {}
 	task.spawn(function()
 		projectileRemote = bedwars.Client:Get(remotes.FireProjectile).instance
+		local suc, rem = pcall(function()
+			return replicatedStorage.rbxts_include.node_modules['@rbxts'].net.out._NetManaged.ProjectileFire
+		end)
+		if suc then
+			bypassRemote = rem
+			bypassReady = true
+		end
 	end)
 	
 	local function getAmmo(check)
@@ -2943,6 +2951,8 @@ run(function()
 		return items
 	end
 	
+	local Bypass
+
 	ProjectileAura = vape.Categories.Blatant:CreateModule({
 		Name = 'ProjectileAura',
 		Function = function(callback)
@@ -2956,45 +2966,73 @@ run(function()
 							NPCs = Targets.NPCs.Enabled,
 							Wallcheck = Targets.Walls.Enabled
 						})
-	
+
 						if ent then
 							local pos = entitylib.character.RootPart.Position
-							for _, data in getProjectiles() do
-								local item, ammo, projectile, itemMeta = unpack(data)
-								if (FireDelays[item.itemType] or 0) < tick() then
-									rayCheck.FilterDescendantsInstances = {workspace.Map}
-									if# CustomProjectiles.ListEnabled > 0 then
-										projectile = CustomProjectiles.ListEnabled[math.random(1, #CustomProjectiles.ListEnabled)]
-									end
-									local meta = bedwars.ProjectileMeta[projectile]
-									if not meta then
-										continue
-									end
-									local projSpeed, gravity = meta.launchVelocity, meta.gravitationalAcceleration or 196.2
-									local calc = prediction.SolveTrajectory(pos, projSpeed, gravity, ent.RootPart.Position, ent.RootPart.Velocity, workspace.Gravity, ent.HipHeight, ent.Jumping and 42.6 or nil, rayCheck)
-									if calc then
+
+							if Bypass.Enabled and bypassReady then
+								for _, item in store.inventory.inventory.items do
+									local pSrc = bedwars.ItemMeta[item.itemType] and bedwars.ItemMeta[item.itemType].projectileSource
+									if item.tool and pSrc and (FireDelays[item.itemType] or 0) < tick() then
+										local dist = (ent.RootPart.Position - pos).Magnitude
+										local dir = (ent.RootPart.Position - pos).Unit
+										local vel = dir * (200 + dist)
+										switchItem(item.tool, 0)
 										targetinfo.Targets[ent] = tick() + 1
-										local switched = switchItem(item.tool)
-	
+										FireDelays[item.itemType] = tick() + 0.15
 										task.spawn(function()
-											local dir, id = CFrame.lookAt(pos, calc).LookVector, httpService:GenerateGUID(true)
-											local shootPosition = (CFrame.new(pos, calc) * CFrame.new(Vector3.new(-bedwars.BowConstantsTable.RelX, -bedwars.BowConstantsTable.RelY, -bedwars.BowConstantsTable.RelZ))).Position
-											bedwars.ProjectileController:createLocalProjectile(meta, ammo, projectile, shootPosition, id, dir * projSpeed, {drawDurationSeconds = 1})
-											local res = projectileRemote:InvokeServer(item.tool, ammo, projectile, shootPosition, pos, dir * projSpeed, id, {drawDurationSeconds = 1, shotId = httpService:GenerateGUID(false)}, workspace:GetServerTimeNow())
-											if not res then
-												FireDelays[item.itemType] = tick()
-											else
-												local shoot = itemMeta.launchSound
-												shoot = shoot and shoot[math.random(1, #shoot)] or nil
-												if shoot then
-													bedwars.SoundManager:playSound(shoot)
-												end
-											end
+											pcall(bypassRemote.InvokeServer, bypassRemote,
+												item.tool,
+												'volley_arrow',
+												'arrow',
+												pos,
+												pos,
+												vel,
+												httpService:GenerateGUID(false),
+												{shotId = httpService:GenerateGUID(false), drawDurationSec = 9e9},
+												workspace:GetServerTimeNow()
+											)
 										end)
-	
-										FireDelays[item.itemType] = tick() + itemMeta.fireDelaySec
-										if switched then
-											task.wait(0.05)
+									end
+								end
+							else
+								for _, data in getProjectiles() do
+									local item, ammo, projectile, itemMeta = unpack(data)
+									if (FireDelays[item.itemType] or 0) < tick() then
+										rayCheck.FilterDescendantsInstances = {workspace.Map}
+										if# CustomProjectiles.ListEnabled > 0 then
+											projectile = CustomProjectiles.ListEnabled[math.random(1, #CustomProjectiles.ListEnabled)]
+										end
+										local meta = bedwars.ProjectileMeta[projectile]
+										if not meta then
+											continue
+										end
+										local projSpeed, gravity = meta.launchVelocity, meta.gravitationalAcceleration or 196.2
+										local calc = prediction.SolveTrajectory(pos, projSpeed, gravity, ent.RootPart.Position, ent.RootPart.Velocity, workspace.Gravity, ent.HipHeight, ent.Jumping and 42.6 or nil, rayCheck)
+										if calc then
+											targetinfo.Targets[ent] = tick() + 1
+											local switched = switchItem(item.tool)
+
+											task.spawn(function()
+												local dir, id = CFrame.lookAt(pos, calc).LookVector, httpService:GenerateGUID(true)
+												local shootPosition = (CFrame.new(pos, calc) * CFrame.new(Vector3.new(-bedwars.BowConstantsTable.RelX, -bedwars.BowConstantsTable.RelY, -bedwars.BowConstantsTable.RelZ))).Position
+												bedwars.ProjectileController:createLocalProjectile(meta, ammo, projectile, shootPosition, id, dir * projSpeed, {drawDurationSeconds = 1})
+												local res = projectileRemote:InvokeServer(item.tool, ammo, projectile, shootPosition, pos, dir * projSpeed, id, {drawDurationSeconds = 1, shotId = httpService:GenerateGUID(false)}, workspace:GetServerTimeNow())
+												if not res then
+													FireDelays[item.itemType] = tick()
+												else
+													local shoot = itemMeta.launchSound
+													shoot = shoot and shoot[math.random(1, #shoot)] or nil
+													if shoot then
+														bedwars.SoundManager:playSound(shoot)
+													end
+												end
+											end)
+
+											FireDelays[item.itemType] = tick() + itemMeta.fireDelaySec
+											if switched then
+												task.wait(0.05)
+											end
 										end
 									end
 								end
@@ -3027,6 +3065,10 @@ run(function()
 		Suffix = function(val)
 			return val == 1 and 'stud' or 'studs'
 		end
+	})
+	Bypass = ProjectileAura:CreateToggle({
+		Name = 'Bypass',
+		Tooltip = 'Uses direct remote + volley exploit for uncapped arrows'
 	})
 end)
 
