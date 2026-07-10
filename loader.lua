@@ -67,7 +67,7 @@ local function finishLoading()
 				if json.sha == getcommit() then return end
 				writefile('spoofz/profiles/commit.txt', json.sha or 'production')
 				delfolder('spoofz/games')
-				vape:CreateNotification('Updated', 'A new update will be applied on reload')
+				vape:CreateNotification('Updated', 'A new update will be applied on reload. Reinject now to update immediately.')
 			end
 		until not vape.Loaded
 	end)

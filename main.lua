@@ -69,7 +69,7 @@ local function finishLoading()
 				delfolder('spoofz/games')
 				delfolder('spoofz/guis')
 				delfolder('spoofz/libraries')
-				vape:CreateNotification('Updated', 'A new update will be applied on reload')
+				vape:CreateNotification('Updated', 'A new update will be applied on reload. Reinject now to update immediately.')
 			end
 		until not vape.Loaded
 	end)
