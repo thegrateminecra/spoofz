@@ -2053,6 +2053,10 @@ run(function()
 		Name = 'Killaura',
 		Function = function(callback)
 			if callback then
+				task.spawn(function()
+					AttackRemote = bedwars.Client:Get(remotes.AttackEntity).instance
+				end)
+
 				if inputService.TouchEnabled then
 					pcall(function()
 						lplr.PlayerGui.MobileUI['2'].Visible = Limit.Enabled

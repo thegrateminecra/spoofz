@@ -1,5 +1,8 @@
 repeat task.wait() until game:IsLoaded()
-if shared.spoofz then shared.spoofz:Uninject() end
+if shared.spoofz then
+    shared.spoofz:Uninject()
+    task.wait()
+end
 
 local vape
 local loadstring = function(...)
