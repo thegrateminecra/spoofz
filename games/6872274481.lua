@@ -2063,29 +2063,7 @@ run(function()
 					end)
 				end
 
-				if Animation.Enabled and not (identifyexecutor and table.find({'Argon', 'Delta'}, ({identifyexecutor()})[1])) then
-					local fake = {
-						Controllers = {
-							ViewmodelController = {
-								isVisible = function()
-									return not Attacking
-								end,
-								playAnimation = function(...)
-									if not Attacking then
-										bedwars.ViewmodelController:playAnimation(select(2, ...))
-									end
-								end
-							}
-						}
-					}
-					Killaura._swappedAnim = true
-					local _, upval = debug.getupvalue(oldSwing or bedwars.SwordController.playSwordEffect, 6)
-					Killaura._oldSwingUpval = upval
-					local _, upval2 = debug.getupvalue(bedwars.ScytheController.playLocalAnimation, 3)
-					Killaura._oldScytheUpval = upval2
-					debug.setupvalue(oldSwing or bedwars.SwordController.playSwordEffect, 6, fake)
-					debug.setupvalue(bedwars.ScytheController.playLocalAnimation, 3, fake)
-
+				if Animation.Enabled then
 					task.spawn(function()
 						local started = false
 						repeat
@@ -2231,11 +2209,6 @@ run(function()
 					pcall(function()
 						lplr.PlayerGui.MobileUI['2'].Visible = true
 					end)
-				end
-				if Killaura._swappedAnim then
-					Killaura._swappedAnim = false
-					debug.setupvalue(oldSwing or bedwars.SwordController.playSwordEffect, 6, Killaura._oldSwingUpval or bedwars.Knit)
-					debug.setupvalue(bedwars.ScytheController.playLocalAnimation, 3, Killaura._oldScytheUpval or bedwars.Knit)
 				end
 				Attacking = false
 				if armC0 then
