@@ -2078,6 +2078,11 @@ run(function()
 							}
 						}
 					}
+					Killaura._swappedAnim = true
+					local _, upval = debug.getupvalue(oldSwing or bedwars.SwordController.playSwordEffect, 6)
+					Killaura._oldSwingUpval = upval
+					local _, upval2 = debug.getupvalue(bedwars.ScytheController.playLocalAnimation, 3)
+					Killaura._oldScytheUpval = upval2
 					debug.setupvalue(oldSwing or bedwars.SwordController.playSwordEffect, 6, fake)
 					debug.setupvalue(bedwars.ScytheController.playLocalAnimation, 3, fake)
 
@@ -2227,8 +2232,11 @@ run(function()
 						lplr.PlayerGui.MobileUI['2'].Visible = true
 					end)
 				end
-				debug.setupvalue(oldSwing or bedwars.SwordController.playSwordEffect, 6, bedwars.Knit)
-				debug.setupvalue(bedwars.ScytheController.playLocalAnimation, 3, bedwars.Knit)
+				if Killaura._swappedAnim then
+					Killaura._swappedAnim = false
+					debug.setupvalue(oldSwing or bedwars.SwordController.playSwordEffect, 6, Killaura._oldSwingUpval or bedwars.Knit)
+					debug.setupvalue(bedwars.ScytheController.playLocalAnimation, 3, Killaura._oldScytheUpval or bedwars.Knit)
+				end
 				Attacking = false
 				if armC0 then
 					AnimTween = tweenService:Create(gameCamera.Viewmodel.RightHand.RightWrist, TweenInfo.new(AnimationTween.Enabled and 0.001 or 0.3, Enum.EasingStyle.Exponential), {
